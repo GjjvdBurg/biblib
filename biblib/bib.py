@@ -9,6 +9,7 @@ own parser.
 __all__ = "Parser Entry FieldError resolve_crossrefs".split()
 
 import collections
+import collections.abc
 import re
 import sys
 import textwrap
@@ -113,7 +114,7 @@ class Parser:
             self.__data = str_or_fp_or_iter
             fname = name or "<string>"
         elif isinstance(
-            str_or_fp_or_iter, collections.Iterable
+            str_or_fp_or_iter, collections.abc.Iterable
         ) and not hasattr(str_or_fp_or_iter, "read"):
             for obj in str_or_fp_or_iter:
                 with recoverer:
