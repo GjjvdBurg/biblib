@@ -2,7 +2,8 @@ import collections
 import threading
 import warnings
 
-class Pos(collections.namedtuple('Pos', 'fname line col log_fp')):
+
+class Pos(collections.namedtuple("Pos", "fname line col log_fp")):
     """A position in a file.
 
     This also optionally tracks a file-like object for logging
@@ -10,7 +11,7 @@ class Pos(collections.namedtuple('Pos', 'fname line col log_fp')):
     """
 
     def __str__(self):
-        return '{}:{}:{}'.format(self.fname, self.line, self.col)
+        return "{}:{}:{}".format(self.fname, self.line, self.col)
 
     def warn(self, msg):
         """Log msg to this Pos's logger.
@@ -18,15 +19,17 @@ class Pos(collections.namedtuple('Pos', 'fname line col log_fp')):
         If log_fp is None, the warning is silently discarded.
         """
         if self.log_fp is not None:
-            self.log_fp.write('{}: warning: {}\n'.format(self, msg))
+            self.log_fp.write("{}: warning: {}\n".format(self, msg))
 
     def raise_error(self, msg):
         """Log and raise InputError([(self, msg)])."""
         if self.log_fp is not None:
-            self.log_fp.write('{}: error: {}\n'.format(self, msg))
+            self.log_fp.write("{}: error: {}\n".format(self, msg))
         raise InputError([(self, msg)])
 
-Pos.unknown = Pos('<unknown>', 1, 0, None)
+
+Pos.unknown = Pos("<unknown>", 1, 0, None)
+
 
 class PosFactory:
     """A factory that translates character offsets to Pos instances."""
@@ -42,8 +45,8 @@ class PosFactory:
         if last_off < offset:
             last_off, last_line, last_col = 0, 1, 0
 
-        line = self.__string.count('\n', last_off, offset) + last_line
-        lastnl = self.__string.rfind('\n', last_off, offset)
+        line = self.__string.count("\n", last_off, offset) + last_line
+        lastnl = self.__string.rfind("\n", last_off, offset)
         if lastnl == -1:
             col = last_col + (offset - last_off)
         else:
@@ -51,6 +54,7 @@ class PosFactory:
         self.__cache = (offset, line, col)
 
         return Pos(self.__fname, line, col, self.__log_fp)
+
 
 class InputError(ValueError):
     """One or more errors with associated Pos instances.
@@ -66,8 +70,9 @@ class InputError(ValueError):
     def __str__(self):
         list_of_msg_pos = self.args[0]
         if len(list_of_msg_pos) == 1:
-            return '1 error'
-        return '{} errors'.format(len(list_of_msg_pos))
+            return "1 error"
+        return "{} errors".format(len(list_of_msg_pos))
+
 
 class InputErrorRecoverer:
     """A context manager for recovering from and bundling InputErrors.
@@ -98,7 +103,7 @@ class InputErrorRecoverer:
 
     def __exit__(self, exc_type, exc_value, traceback):
         if self.__errors is None:
-            raise ValueError('InputErrorRecoverer already disposed')
+            raise ValueError("InputErrorRecoverer already disposed")
         if isinstance(exc_value, InputError):
             self.__errors.extend(exc_value.args)
             return True
@@ -106,8 +111,10 @@ class InputErrorRecoverer:
     def __del__(self):
         if self.__errors is not None:
             try:
-                warnings.warn('InputErrorRecoverer must be reraised or disposed',
-                              stacklevel=2)
+                warnings.warn(
+                    "InputErrorRecoverer must be reraised or disposed",
+                    stacklevel=2,
+                )
             except TypeError as e:
                 # If Python is exiting, warnings.warn has a habit of
                 # raising TypeError("'NoneType' object is not
